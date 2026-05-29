@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(tree:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nAdd AdaptEd app - AI prompt generator for inclusive education\n\nReact + Vite app that generates AI prompts to help teachers adapt\neducational resources for neurodivergent students. Features:\n- Adapt, Create, Quiz, and Convert tabs\n- Support for 9 conditions (Autism, ADHD, Dyslexia, etc.)\n- Markdown to Word/PDF converter with accessibility styling\n- Configured for DigitalOcean App Platform deployment\n\n🤖 Generated with [Claude Code](https://claude.ai/code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git push:*)",
+      "Bash(git fetch:*)",
+      "Bash(git pull:*)",
+      "Bash(git stash:*)",
+      "Bash(git commit:*)",
+      "Bash(npm run build)",
+      "Bash(npm install:*)",
+      "WebFetch(domain:support.cshub.org.je)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AdaptEd - AI-Powered Inclusive Education Tools</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      color: #333;
+    }
+
+    /* Slide container */
+    .slide {
+      min-height: 100vh;
+      padding: 60px 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+    }
+
+    .slide-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /* Slide variations */
+    .slide-hero {
+      background: linear-gradient(135deg, #1e3d52 0%, #2d5a7b 50%, #3d7a9e 100%);
+      color: white;
+      text-align: center;
+    }
+
+    .slide-light {
+      background: #f8f9fa;
+    }
+
+    .slide-green {
+      background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+    }
+
+    .slide-blue {
+      background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+    }
+
+    .slide-purple {
+      background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+    }
+
+    .slide-orange {
+      background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+    }
+
+    .slide-dark {
+      background: linear-gradient(135deg, #1e3d52 0%, #2d5a7b 100%);
+      color: white;
+    }
+
+    /* Typography */
+    h1 {
+      font-size: 3.5rem;
+      margin-bottom: 20px;
+      font-weight: 700;
+    }
+
+    h2 {
+      font-size: 2.5rem;
+      margin-bottom: 30px;
+      color: #1e3d52;
+    }
+
+    h3 {
+      font-size: 1.5rem;
+      margin-bottom: 15px;
+      color: #2d5a7b;
+    }
+
+    .slide-dark h2,
+    .slide-dark h3 {
+      color: white;
+    }
+
+    .subtitle {
+      font-size: 1.5rem;
+      opacity: 0.9;
+      margin-bottom: 30px;
+    }
+
+    .tagline {
+      font-size: 1.2rem;
+      opacity: 0.8;
+      margin-top: 40px;
+    }
+
+    /* Logo/branding */
+    .logo {
+      font-size: 5rem;
+      margin-bottom: 20px;
+    }
+
+    .cshub-badge {
+      display: inline-block;
+      background: rgba(255,255,255,0.2);
+      padding: 10px 25px;
+      border-radius: 30px;
+      margin-top: 30px;
+      font-size: 1rem;
+    }
+
+    /* Problem/Solution cards */
+    .problem-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 25px;
+      margin-top: 40px;
+    }
+
+    .problem-card {
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+      border-left: 5px solid #dc3545;
+    }
+
+    .problem-card.solution {
+      border-left-color: #28a745;
+    }
+
+    .problem-card h3 {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .problem-card .icon {
+      font-size: 2rem;
+    }
+
+    /* Feature cards */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 25px;
+      margin-top: 40px;
+    }
+
+    .feature-card {
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+      text-align: center;
+      transition: transform 0.3s;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .feature-card .icon {
+      font-size: 3rem;
+      margin-bottom: 15px;
+    }
+
+    .feature-card.adapt { border-top: 4px solid #007bff; }
+    .feature-card.create { border-top: 4px solid #28a745; }
+    .feature-card.quiz { border-top: 4px solid #ffc107; }
+    .feature-card.convert { border-top: 4px solid #6f42c1; }
+
+    /* Condition tags */
+    .conditions-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      justify-content: center;
+      margin: 40px 0;
+    }
+
+    .condition-tag {
+      background: white;
+      padding: 15px 25px;
+      border-radius: 50px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .condition-tag .emoji {
+      font-size: 1.5rem;
+    }
+
+    /* Steps */
+    .steps-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin-top: 40px;
+    }
+
+    .step {
+      display: flex;
+      align-items: flex-start;
+      gap: 20px;
+      background: white;
+      padding: 25px;
+      border-radius: 15px;
+      box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+    }
+
+    .step-number {
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, #28a745, #20c997);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      font-weight: bold;
+      flex-shrink: 0;
+    }
+
+    .step-content h3 {
+      margin-bottom: 8px;
+      color: #1e3d52;
+    }
+
+    .step-content p {
+      color: #666;
+    }
+
+    /* Workflow */
+    .workflow-visual {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin: 40px 0;
+      padding: 30px;
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    }
+
+    .workflow-step {
+      text-align: center;
+      flex: 1;
+      min-width: 100px;
+    }
+
+    .workflow-step .icon {
+      font-size: 3rem;
+      margin-bottom: 10px;
+    }
+
+    .workflow-step .label {
+      font-weight: 600;
+      color: #1e3d52;
+    }
+
+    .workflow-arrow {
+      font-size: 2rem;
+      color: #28a745;
+    }
+
+    /* Benefits list */
+    .benefits-list {
+      list-style: none;
+      margin-top: 30px;
+    }
+
+    .benefits-list li {
+      padding: 15px 20px;
+      margin-bottom: 15px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      font-size: 1.1rem;
+    }
+
+    .benefits-list .check {
+      color: #28a745;
+      font-size: 1.5rem;
+    }
+
+    /* Screenshot placeholder */
+    .screenshot {
+      background: #ddd;
+      border-radius: 10px;
+      padding: 40px;
+      text-align: center;
+      margin: 30px 0;
+      border: 3px dashed #999;
+    }
+
+    /* Two column layout */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      align-items: center;
+    }
+
+    /* CTA button */
+    .cta-button {
+      display: inline-block;
+      background: linear-gradient(135deg, #28a745, #20c997);
+      color: white;
+      padding: 18px 40px;
+      border-radius: 50px;
+      text-decoration: none;
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-top: 30px;
+      box-shadow: 0 5px 20px rgba(40, 167, 69, 0.4);
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .cta-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(40, 167, 69, 0.5);
+    }
+
+    .cta-button.secondary {
+      background: white;
+      color: #1e3d52;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    }
+
+    /* Quote */
+    .quote {
+      font-size: 1.4rem;
+      font-style: italic;
+      text-align: center;
+      padding: 40px;
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+      position: relative;
+      margin: 40px 0;
+    }
+
+    .quote::before {
+      content: '"';
+      font-size: 5rem;
+      position: absolute;
+      top: -10px;
+      left: 20px;
+      color: #28a745;
+      opacity: 0.3;
+    }
+
+    /* Navigation dots */
+    .nav-dots {
+      position: fixed;
+      right: 30px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      z-index: 100;
+    }
+
+    .nav-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.2);
+      cursor: pointer;
+      transition: background 0.3s, transform 0.3s;
+    }
+
+    .nav-dot:hover {
+      background: #28a745;
+      transform: scale(1.3);
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding: 20px;
+      background: #1e3d52;
+      color: white;
+    }
+
+    .footer a {
+      color: #20c997;
+      text-decoration: none;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      h1 { font-size: 2.5rem; }
+      h2 { font-size: 2rem; }
+      .slide { padding: 40px 20px; }
+      .two-col { grid-template-columns: 1fr; }
+      .workflow-visual { flex-direction: column; }
+      .workflow-arrow { transform: rotate(90deg); }
+      .nav-dots { display: none; }
+    }
+
+    @media print {
+      .slide {
+        page-break-after: always;
+        min-height: auto;
+        padding: 40px;
+      }
+      .nav-dots { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation dots -->
+  <nav class="nav-dots">
+    <a href="#slide1" class="nav-dot" title="Introduction"></a>
+    <a href="#slide2" class="nav-dot" title="The Challenge"></a>
+    <a href="#slide3" class="nav-dot" title="The Solution"></a>
+    <a href="#slide4" class="nav-dot" title="Supported Conditions"></a>
+    <a href="#slide5" class="nav-dot" title="Four Tools"></a>
+    <a href="#slide6" class="nav-dot" title="How It Works"></a>
+    <a href="#slide7" class="nav-dot" title="Benefits"></a>
+    <a href="#slide8" class="nav-dot" title="Get Started"></a>
+  </nav>
+
+  <!-- Slide 1: Hero -->
+  <section id="slide1" class="slide slide-hero">
+    <div class="slide-content">
+      <div class="logo">📚</div>
+      <h1>AdaptEd</h1>
+      <p class="subtitle">AI-Powered Tools for Inclusive Education</p>
+      <p class="tagline">Helping teachers create accessible resources for neurodivergent students in minutes, not hours.</p>
+      <div class="cshub-badge">
+        Supported by CS Hub Jersey
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 2: The Challenge -->
+  <section id="slide2" class="slide slide-light">
+    <div class="slide-content">
+      <h2>The Challenge</h2>
+      <p style="font-size: 1.2rem; max-width: 800px;">Every student learns differently. Creating truly accessible resources takes time that teachers don't have.</p>
+
+      <div class="problem-grid">
+        <div class="problem-card">
+          <h3><span class="icon">⏰</span> Time Pressure</h3>
+          <p>Adapting a single worksheet for multiple conditions can take 30+ minutes. Multiply that by every lesson, every day.</p>
+        </div>
+        <div class="problem-card">
+          <h3><span class="icon">🎯</span> Complex Needs</h3>
+          <p>Students often have multiple conditions (e.g., ADHD + Dyslexia). Knowing how to adapt for each combination is challenging.</p>
+        </div>
+        <div class="problem-card">
+          <h3><span class="icon">📚</span> Expertise Gap</h3>
+          <p>Not every teacher has SENCO training. Generic "make it simpler" advice doesn't help with specific neurological needs.</p>
+        </div>
+        <div class="problem-card">
+          <h3><span class="icon">🔄</span> Consistency</h3>
+          <p>Adapting resources differently each time creates confusion. Students need predictable, consistent formatting.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 3: The Solution -->
+  <section id="slide3" class="slide slide-green">
+    <div class="slide-content">
+      <h2>The Solution: AdaptEd</h2>
+
+      <div class="problem-grid">
+        <div class="problem-card solution">
+          <h3><span class="icon">🤖</span> AI-Powered Prompts</h3>
+          <p>Generate expert-level prompts that tell AI exactly how to adapt resources for specific neurological conditions.</p>
+        </div>
+        <div class="problem-card solution">
+          <h3><span class="icon">🧠</span> Neurologically-Specific</h3>
+          <p>Each condition has tailored rules based on actual cognitive differences, not generic "accessibility" advice.</p>
+        </div>
+        <div class="problem-card solution">
+          <h3><span class="icon">📖</span> Subject-Aware</h3>
+          <p>A Maths resource needs different adaptations than an English resource. AdaptEd knows the difference.</p>
+        </div>
+        <div class="problem-card solution">
+          <h3><span class="icon">📄</span> Ready to Use</h3>
+          <p>Convert AI output directly to accessible Word, PDF, or PowerPoint with dyslexia-friendly formatting.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 4: Supported Conditions -->
+  <section id="slide4" class="slide slide-blue">
+    <div class="slide-content">
+      <h2>9 Conditions Supported</h2>
+      <p style="text-align: center; font-size: 1.1rem; margin-bottom: 20px;">Select up to 3 conditions per resource. Each has specific, evidence-based adaptation rules.</p>
+
+      <div class="conditions-grid">
+        <div class="condition-tag"><span class="emoji">🧩</span> Autism Spectrum</div>
+        <div class="condition-tag"><span class="emoji">⚡</span> ADHD</div>
+        <div class="condition-tag"><span class="emoji">📖</span> Dyslexia</div>
+        <div class="condition-tag"><span class="emoji">🔢</span> Dyscalculia</div>
+        <div class="condition-tag"><span class="emoji">😰</span> Anxiety</div>
+        <div class="condition-tag"><span class="emoji">👁️</span> Visual Processing</div>
+        <div class="condition-tag"><span class="emoji">🧠</span> Working Memory</div>
+        <div class="condition-tag"><span class="emoji">🐢</span> Slow Processing</div>
+        <div class="condition-tag"><span class="emoji">🌍</span> EAL</div>
+      </div>
+
+      <div class="quote">
+        "For Autism, we use literal language and explicit sequencing. For ADHD, we chunk content and add time anchors. For Dyslexia, we reduce reading load. Each condition gets what it actually needs."
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 5: Four Tools -->
+  <section id="slide5" class="slide slide-light">
+    <div class="slide-content">
+      <h2>Four Powerful Tools</h2>
+
+      <div class="feature-grid">
+        <div class="feature-card adapt">
+          <div class="icon">🔄</div>
+          <h3>Adapt</h3>
+          <p>Paste an existing resource and generate a prompt to adapt it for specific conditions. Keep the content, improve accessibility.</p>
+        </div>
+        <div class="feature-card create">
+          <div class="icon">✨</div>
+          <h3>Create</h3>
+          <p>Build new resources from scratch. Specify topic, objectives, format, and duration. Get subject-specific pedagogy built in.</p>
+        </div>
+        <div class="feature-card quiz">
+          <div class="icon">❓</div>
+          <h3>Quiz</h3>
+          <p>Generate accessible assessments. Choose question types, difficulty, and whether to include answers.</p>
+        </div>
+        <div class="feature-card convert">
+          <div class="icon">📄</div>
+          <h3>Convert</h3>
+          <p>Turn AI output into accessible documents. Dyslexia-friendly fonts, cream backgrounds, LaTeX maths support.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 6: How It Works -->
+  <section id="slide6" class="slide slide-purple">
+    <div class="slide-content">
+      <h2>How It Works</h2>
+
+      <div class="workflow-visual">
+        <div class="workflow-step">
+          <div class="icon">👤</div>
+          <div class="label">1. Set Profile</div>
+        </div>
+        <div class="workflow-arrow">→</div>
+        <div class="workflow-step">
+          <div class="icon">📝</div>
+          <div class="label">2. Choose Tab</div>
+        </div>
+        <div class="workflow-arrow">→</div>
+        <div class="workflow-step">
+          <div class="icon">📋</div>
+          <div class="label">3. Generate Prompt</div>
+        </div>
+        <div class="workflow-arrow">→</div>
+        <div class="workflow-step">
+          <div class="icon">🤖</div>
+          <div class="label">4. Paste in AI</div>
+        </div>
+        <div class="workflow-arrow">→</div>
+        <div class="workflow-step">
+          <div class="icon">📄</div>
+          <div class="label">5. Convert</div>
+        </div>
+        <div class="workflow-arrow">→</div>
+        <div class="workflow-step">
+          <div class="icon">⬇️</div>
+          <div class="label">6. Download</div>
+        </div>
+      </div>
+
+      <div class="steps-container">
+        <div class="step">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <h3>Set Up Student Profile</h3>
+            <p>Select conditions (e.g., Dyslexia + ADHD), choose subject (Maths, English, Science...), and pick Key Stage (KS1-KS5).</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <h3>Fill In Details & Generate</h3>
+            <p>Provide topic, learning objectives, and preferences. Click "Generate Prompt" to create your AI instructions.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <h3>Use with Any AI</h3>
+            <p>Copy the prompt and paste into Copilot, ChatGPT, or Claude. The AI will generate your adapted resource.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-number">4</div>
+          <div class="step-content">
+            <h3>Convert & Download</h3>
+            <p>Paste the AI's response into the Convert tab. Apply accessibility options and download as Word, PDF, or PowerPoint.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 7: Benefits -->
+  <section id="slide7" class="slide slide-orange">
+    <div class="slide-content">
+      <h2>Why Teachers Love AdaptEd</h2>
+
+      <div class="two-col">
+        <div>
+          <ul class="benefits-list">
+            <li><span class="check">✓</span> <strong>Save 30+ minutes</strong> per adapted resource</li>
+            <li><span class="check">✓</span> <strong>Expert-level adaptations</strong> without SENCO training</li>
+            <li><span class="check">✓</span> <strong>Combine conditions</strong> (up to 3) for complex needs</li>
+            <li><span class="check">✓</span> <strong>Subject-specific</strong> pedagogy built in</li>
+            <li><span class="check">✓</span> <strong>Consistent formatting</strong> across all resources</li>
+            <li><span class="check">✓</span> <strong>Works with free AI</strong> (Copilot, ChatGPT free tier)</li>
+          </ul>
+        </div>
+        <div>
+          <ul class="benefits-list">
+            <li><span class="check">✓</span> <strong>Dyslexia-friendly exports</strong> with one click</li>
+            <li><span class="check">✓</span> <strong>LaTeX maths support</strong> for STEM subjects</li>
+            <li><span class="check">✓</span> <strong>KS1 to KS5</strong> coverage</li>
+            <li><span class="check">✓</span> <strong>6 subjects</strong> with specific pedagogies</li>
+            <li><span class="check">✓</span> <strong>Free to use</strong> - no login required</li>
+            <li><span class="check">✓</span> <strong>Works on any device</strong> - browser based</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 8: Get Started -->
+  <section id="slide8" class="slide slide-dark">
+    <div class="slide-content" style="text-align: center;">
+      <div class="logo">🚀</div>
+      <h2 style="color: white;">Ready to Get Started?</h2>
+      <p class="subtitle">Create your first adapted resource in under 5 minutes.</p>
+
+      <div style="margin: 40px 0;">
+        <a href="https://support.cshub.org.je" class="cta-button">Launch AdaptEd</a>
+        <a href="infographic.html" class="cta-button secondary" style="margin-left: 20px;">View Quick Guide</a>
+      </div>
+
+      <div style="margin-top: 60px; opacity: 0.9;">
+        <p style="font-size: 1.1rem; margin-bottom: 15px;">Supported AI Platforms:</p>
+        <div style="display: flex; justify-content: center; gap: 30px; flex-wrap: wrap;">
+          <span style="font-size: 1.2rem;">🟢 Microsoft Copilot</span>
+          <span style="font-size: 1.2rem;">🟢 ChatGPT</span>
+          <span style="font-size: 1.2rem;">🟢 Claude</span>
+        </div>
+      </div>
+
+      <div style="margin-top: 60px; padding-top: 40px; border-top: 1px solid rgba(255,255,255,0.2);">
+        <p style="opacity: 0.8;">Part of the CS Hub Jersey Support Network</p>
+        <p style="opacity: 0.6; margin-top: 10px;">Designed by Dr Galan | <a href="https://coderra.je" style="color: #20c997;">Coderra.je</a></p>
+      </div>
+    </div>
+  </section>
+
+</body>
+</html>

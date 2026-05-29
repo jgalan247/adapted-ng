@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AdaptEd - How It Works</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #1e3d52 0%, #2d5a7b 100%);
+      min-height: 100vh;
+      padding: 40px 20px;
+      color: #2c3e50;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .header h1 {
+      font-size: 2.5rem;
+      color: #1e3d52;
+      margin-bottom: 10px;
+    }
+
+    .header .subtitle {
+      font-size: 1.2rem;
+      color: #666;
+    }
+
+    .header .school {
+      font-size: 1rem;
+      color: #2d5a7b;
+      margin-top: 5px;
+    }
+
+    .flow-section {
+      margin-bottom: 50px;
+    }
+
+    .section-title {
+      font-size: 1.5rem;
+      color: #1e3d52;
+      margin-bottom: 25px;
+      padding-bottom: 10px;
+      border-bottom: 3px solid #28a745;
+      display: inline-block;
+    }
+
+    .steps {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .step {
+      display: flex;
+      align-items: flex-start;
+      gap: 20px;
+      padding: 20px;
+      background: #f8f9fa;
+      border-radius: 15px;
+      border-left: 5px solid #28a745;
+    }
+
+    .step-number {
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, #28a745, #20c997);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      font-weight: bold;
+      flex-shrink: 0;
+    }
+
+    .step-content h3 {
+      font-size: 1.2rem;
+      color: #1e3d52;
+      margin-bottom: 8px;
+    }
+
+    .step-content p {
+      color: #666;
+      line-height: 1.5;
+    }
+
+    .arrow {
+      text-align: center;
+      font-size: 2rem;
+      color: #28a745;
+      margin: 10px 0;
+    }
+
+    .tabs-section {
+      margin: 40px 0;
+    }
+
+    .tabs-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+    }
+
+    .tab-card {
+      background: white;
+      border-radius: 15px;
+      padding: 25px;
+      text-align: center;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      border: 2px solid #e9ecef;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .tab-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+
+    .tab-icon {
+      font-size: 3rem;
+      margin-bottom: 15px;
+    }
+
+    .tab-card h3 {
+      color: #1e3d52;
+      margin-bottom: 10px;
+    }
+
+    .tab-card p {
+      color: #666;
+      font-size: 0.9rem;
+      line-height: 1.4;
+    }
+
+    .tab-adapt { border-color: #007bff; }
+    .tab-create { border-color: #28a745; }
+    .tab-quiz { border-color: #ffc107; }
+    .tab-convert { border-color: #6f42c1; }
+
+    .workflow {
+      background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+      border-radius: 15px;
+      padding: 30px;
+      margin: 30px 0;
+    }
+
+    .workflow h3 {
+      text-align: center;
+      color: #1e3d52;
+      margin-bottom: 25px;
+      font-size: 1.3rem;
+    }
+
+    .workflow-steps {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .workflow-step {
+      flex: 1;
+      min-width: 120px;
+      text-align: center;
+      padding: 15px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .workflow-step .icon {
+      font-size: 2rem;
+      margin-bottom: 10px;
+    }
+
+    .workflow-step .label {
+      font-weight: 600;
+      color: #1e3d52;
+      font-size: 0.9rem;
+    }
+
+    .workflow-arrow {
+      font-size: 1.5rem;
+      color: #28a745;
+    }
+
+    .tips {
+      background: #fff3cd;
+      border-radius: 15px;
+      padding: 25px;
+      margin-top: 30px;
+    }
+
+    .tips h3 {
+      color: #856404;
+      margin-bottom: 15px;
+    }
+
+    .tips ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .tips li {
+      padding: 8px 0;
+      padding-left: 25px;
+      position: relative;
+      color: #856404;
+    }
+
+    .tips li::before {
+      content: "💡";
+      position: absolute;
+      left: 0;
+    }
+
+    .conditions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 20px;
+      justify-content: center;
+    }
+
+    .condition-tag {
+      background: #e3f2fd;
+      color: #1565c0;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid #e9ecef;
+      color: #666;
+      font-size: 0.9rem;
+    }
+
+    .footer a {
+      color: #2d5a7b;
+      text-decoration: none;
+    }
+
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      .container {
+        box-shadow: none;
+        padding: 20px;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .workflow-steps {
+        flex-direction: column;
+      }
+      .workflow-arrow {
+        transform: rotate(90deg);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>📚 AdaptEd - How It Works</h1>
+      <div class="subtitle">AI Powered for Inclusive Education</div>
+      <div class="school">Le Rocquier School</div>
+    </div>
+
+    <div class="flow-section">
+      <h2 class="section-title">Quick Start Guide</h2>
+
+      <div class="steps">
+        <div class="step">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <h3>Set Up Student Profile</h3>
+            <p>Select up to 3 conditions (e.g., Dyslexia, ADHD, Autism), choose the subject, and pick the appropriate Key Stage (KS1-KS5).</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <h3>Choose Your Task</h3>
+            <p>Select one of the four tabs: Adapt (modify existing resources), Create (build new resources), Quiz (generate assessments), or Convert (export to Word/PDF).</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <h3>Fill In the Details</h3>
+            <p>Follow the wizard steps to provide topic, learning objectives, format preferences, and any specific requirements.</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-number">4</div>
+          <div class="step-content">
+            <h3>Generate & Copy Prompt</h3>
+            <p>Click "Generate Prompt" then copy it to your clipboard. The prompt contains all the instructions the AI needs.</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-number">5</div>
+          <div class="step-content">
+            <h3>Paste into AI (ChatGPT/Copilot)</h3>
+            <p>Open ChatGPT, Microsoft Copilot, or Claude and paste the prompt. The AI will generate your adapted resource.</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-number">6</div>
+          <div class="step-content">
+            <h3>Convert & Download</h3>
+            <p>Copy the AI's response, go to the Convert tab, paste it in, apply accessibility styling, and download as Word, PDF, PowerPoint, or HTML.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tabs-section">
+      <h2 class="section-title">The Four Tabs</h2>
+
+      <div class="tabs-grid">
+        <div class="tab-card tab-adapt">
+          <div class="tab-icon">🔄</div>
+          <h3>Adapt</h3>
+          <p>Paste an existing resource and get a prompt to adapt it for your students' specific needs.</p>
+        </div>
+
+        <div class="tab-card tab-create">
+          <div class="tab-icon">✨</div>
+          <h3>Create</h3>
+          <p>Build a new resource from scratch. Specify topic, objectives, format, and duration.</p>
+        </div>
+
+        <div class="tab-card tab-quiz">
+          <div class="tab-icon">❓</div>
+          <h3>Quiz</h3>
+          <p>Generate accessible assessments with various question types and difficulty levels.</p>
+        </div>
+
+        <div class="tab-card tab-convert">
+          <div class="tab-icon">📄</div>
+          <h3>Convert</h3>
+          <p>Turn AI-generated markdown into accessible Word, PDF, PowerPoint, or HTML files.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="workflow">
+      <h3>Complete Workflow</h3>
+      <div class="workflow-steps">
+        <div class="workflow-step">
+          <div class="icon">👤</div>
+          <div class="label">Set Profile</div>
+        </div>
+        <div class="workflow-arrow">→</div>
+        <div class="workflow-step">
+          <div class="icon">📝</div>
+          <div class="label">Use Tab</div>
+        </div>
+        <div class="workflow-arrow">→</div>
+        <div class="workflow-step">
+          <div class="icon">📋</div>
+          <div class="label">Copy Prompt</div>
+        </div>
+        <div class="workflow-arrow">→</div>
+        <div class="workflow-step">
+          <div class="icon">🤖</div>
+          <div class="label">Paste in AI</div>
+        </div>
+        <div class="workflow-arrow">→</div>
+        <div class="workflow-step">
+          <div class="icon">📄</div>
+          <div class="label">Convert</div>
+        </div>
+        <div class="workflow-arrow">→</div>
+        <div class="workflow-step">
+          <div class="icon">⬇️</div>
+          <div class="label">Download</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="text-align: center; margin: 30px 0;">
+      <h3 style="color: #1e3d52; margin-bottom: 15px;">Supported Conditions</h3>
+      <div class="conditions">
+        <span class="condition-tag">Autism</span>
+        <span class="condition-tag">ADHD</span>
+        <span class="condition-tag">Dyslexia</span>
+        <span class="condition-tag">Dyscalculia</span>
+        <span class="condition-tag">Anxiety</span>
+        <span class="condition-tag">Visual Processing</span>
+        <span class="condition-tag">Working Memory</span>
+        <span class="condition-tag">Slow Processing</span>
+        <span class="condition-tag">EAL</span>
+      </div>
+    </div>
+
+    <div class="tips">
+      <h3>Top Tips for Teachers</h3>
+      <ul>
+        <li>Use <strong>Quick Presets</strong> to save time with common condition combinations</li>
+        <li>Select up to <strong>3 conditions</strong> to combine adaptations for complex needs</li>
+        <li>The <strong>Convert tab</strong> can apply dyslexia-friendly fonts automatically</li>
+        <li>Always <strong>review AI output</strong> before using with students</li>
+        <li>Save your prompts by downloading them as text files for future use</li>
+      </ul>
+    </div>
+
+    <div class="footer">
+      <p>Designed and Created by Dr Galan | <a href="https://coderra.je">Coderra.je</a></p>
+    </div>
+  </div>
+</body>
+</html>
