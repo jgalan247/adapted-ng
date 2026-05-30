@@ -1,0 +1,6 @@
+name = "adapted-ng-api"
+main = "worker.js"
+compatibility_date = "2025-01-01"
+
+# Set the secret with: wrangler secret put ANTHROPIC_API_KEY
+# (Run from the worker/ directory.)

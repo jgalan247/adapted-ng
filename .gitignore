@@ -19,3 +19,8 @@ dist/
 # Logs
 *.log
 npm-debug.log*
+
+# Cloudflare Wrangler
+.wrangler/
+worker/.wrangler/
+worker/.dev.vars

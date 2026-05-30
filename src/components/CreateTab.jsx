@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { generateCreatePrompt } from '../utils/promptGenerator'
+import { generateStream } from '../lib/generate'
 
 const RESOURCE_TYPES = [
   { value: 'worksheet', label: 'Worksheet' },
@@ -29,6 +30,11 @@ function CreateTab({ profile }) {
   })
   const [generatedPrompt, setGeneratedPrompt] = useState('')
   const [copied, setCopied] = useState(false)
+  const [aiOutput, setAiOutput] = useState('')
+  const [aiStatus, setAiStatus] = useState('idle') // 'idle' | 'streaming' | 'done' | 'error'
+  const [aiError, setAiError] = useState('')
+  const [quality, setQuality] = useState('standard') // 'standard' (Haiku) | 'high' (Sonnet)
+  const abortRef = useRef(null)
 
   const steps = [
     { num: 1, label: 'Topic & Objectives' },
@@ -50,6 +56,46 @@ function CreateTab({ profile }) {
     navigator.clipboard.writeText(generatedPrompt)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
+  }
+
+  const runAiGeneration = async () => {
+    setAiOutput('')
+    setAiError('')
+    setAiStatus('streaming')
+    const controller = new AbortController()
+    abortRef.current = controller
+    const model = quality === 'high' ? 'claude-sonnet-4-6' : 'claude-haiku-4-5'
+    const system =
+      'You are an expert UK secondary teacher and SENCO specialising in accessible, inclusive resources for neurodivergent students at KS3, KS4, and KS5. Always return well-structured Markdown.'
+    try {
+      for await (const chunk of generateStream({
+        prompt: generatedPrompt,
+        system,
+        model,
+        signal: controller.signal,
+      })) {
+        setAiOutput((prev) => prev + chunk)
+      }
+      setAiStatus('done')
+    } catch (err) {
+      if (controller.signal.aborted) {
+        setAiStatus('done')
+      } else {
+        setAiError(err.message || String(err))
+        setAiStatus('error')
+      }
+    } finally {
+      abortRef.current = null
+    }
+  }
+
+  const stopAiGeneration = () => {
+    abortRef.current?.abort()
+  }
+
+  const copyAiOutput = () => {
+    if (!aiOutput) return
+    navigator.clipboard.writeText(aiOutput)
   }
 
   const downloadPrompt = () => {
@@ -226,6 +272,65 @@ function CreateTab({ profile }) {
                 </div>
               </div>
               <pre className="prompt-content">{generatedPrompt}</pre>
+            </div>
+
+            <div style={{
+              marginTop: '24px',
+              padding: '20px',
+              background: '#f4f0ff',
+              border: '1px solid #d9ccff',
+              borderRadius: '12px',
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', marginBottom: '12px' }}>
+                <h3 style={{ margin: 0 }}>🤖 Generate with AI</h3>
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                  <label style={{ fontSize: '0.9em' }}>
+                    Quality:&nbsp;
+                    <select value={quality} onChange={(e) => setQuality(e.target.value)} disabled={aiStatus === 'streaming'}>
+                      <option value="standard">Standard (Haiku, cheap & fast)</option>
+                      <option value="high">High (Sonnet, slower)</option>
+                    </select>
+                  </label>
+                  {aiStatus !== 'streaming' ? (
+                    <button className="btn btn-primary" onClick={runAiGeneration}>
+                      {aiOutput ? '♻ Regenerate' : '✨ Generate'}
+                    </button>
+                  ) : (
+                    <button className="btn btn-secondary" onClick={stopAiGeneration}>
+                      ⏹ Stop
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {aiStatus === 'error' && (
+                <div style={{ color: '#b00020', marginBottom: '12px' }}>
+                  Error: {aiError}
+                </div>
+              )}
+
+              {(aiOutput || aiStatus === 'streaming') && (
+                <>
+                  <pre className="prompt-content" style={{ maxHeight: '500px', overflow: 'auto', whiteSpace: 'pre-wrap' }}>
+                    {aiOutput}
+                    {aiStatus === 'streaming' && <span>▌</span>}
+                  </pre>
+                  {aiStatus === 'done' && (
+                    <div style={{ marginTop: '8px' }}>
+                      <button className="btn btn-secondary" onClick={copyAiOutput}>📋 Copy Markdown</button>
+                      <span style={{ marginLeft: '12px', fontSize: '0.9em', color: '#555' }}>
+                        Tip: paste this into the <strong>Convert</strong> tab for a Word/PDF download.
+                      </span>
+                    </div>
+                  )}
+                </>
+              )}
+
+              {!aiOutput && aiStatus === 'idle' && (
+                <p style={{ fontSize: '0.9em', color: '#555', margin: 0 }}>
+                  Click Generate to have Claude produce the resource directly. (Requires the Worker to be deployed and <code>VITE_API_BASE</code> to be set.)
+                </p>
+              )}
             </div>
 
             <div className="next-steps">
