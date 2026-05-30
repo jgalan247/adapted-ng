@@ -6,6 +6,13 @@ A web tool that helps UK secondary teachers (KS3, KS4, KS5) create resources tai
 
 Forked from [AdaptEd](https://github.com/jgalan247/inclusion) — currently the prompt-generation MVP. Roadmap below.
 
+## How it's intended to be used
+
+- **At school**: the app generates a prompt. Teachers **copy the prompt and paste it into Microsoft Copilot** — the school-approved AI tool. The app itself never calls an AI from the school network. This keeps the tool fully compliant with school acceptable-use policies that restrict third-party AI services.
+- **At home (optional)**: teachers can enable a "Generate with AI" panel that calls Claude directly via a Cloudflare Worker. This is **off by default** and only appears when the build env var `VITE_ENABLE_AI=true` is set. The hosted school version should never enable it.
+
+This split is deliberate: it lets the same codebase serve both use cases without ever bypassing a school's filter or policy.
+
 ## Roadmap
 
 - [x] Fork base from AdaptEd

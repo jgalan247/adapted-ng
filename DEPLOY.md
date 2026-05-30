@@ -1,5 +1,30 @@
 # Deploying adapted-ng
 
+Two deployment shapes:
+
+1. **School deploy (default, recommended)** — frontend only, on Cloudflare Pages or any static host. **No AI calls from the app.** Teachers copy the generated prompt into Microsoft Copilot (the school-approved tool). Free. Compliant with school AUPs.
+2. **Home / personal deploy (optional)** — frontend + Cloudflare Worker. Enables the in-app "Generate with AI" panel. Costs ~$0.01 per worksheet (your Anthropic API). **Do not enable on a school-facing URL.**
+
+The flag that switches between them is `VITE_ENABLE_AI` (default `false`).
+
+---
+
+## Path 1 — School deploy (frontend only)
+
+```bash
+npm install
+npm run build
+npx wrangler pages deploy dist --project-name=adapted-ng
+```
+
+No env vars needed. No Worker needed. No API key needed.
+
+Or via Cloudflare dashboard: Pages → Connect to Git → build command `npm run build`, output `dist`. Done.
+
+---
+
+## Path 2 — Home deploy (with in-app AI)
+
 End-to-end deploy: free Cloudflare Pages (frontend) + free Cloudflare Worker (API proxy). You only pay for Anthropic API usage (~$0.01 per worksheet on Haiku).
 
 ## Prerequisites
@@ -43,8 +68,11 @@ cp .env.example .env.local
 Edit `.env.local` and set:
 
 ```
+VITE_ENABLE_AI=true
 VITE_API_BASE=https://adapted-ng-api.<your-subdomain>.workers.dev
 ```
+
+Both vars are required to expose the AI panel. If either is missing, the app behaves exactly like the school deploy.
 
 ## 3. Local test
 

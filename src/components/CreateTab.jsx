@@ -274,6 +274,7 @@ function CreateTab({ profile }) {
               <pre className="prompt-content">{generatedPrompt}</pre>
             </div>
 
+            {import.meta.env.VITE_ENABLE_AI === 'true' && (
             <div style={{
               marginTop: '24px',
               padding: '20px',
@@ -328,21 +329,25 @@ function CreateTab({ profile }) {
 
               {!aiOutput && aiStatus === 'idle' && (
                 <p style={{ fontSize: '0.9em', color: '#555', margin: 0 }}>
-                  Click Generate to have Claude produce the resource directly. (Requires the Worker to be deployed and <code>VITE_API_BASE</code> to be set.)
+                  For home use only. Click Generate to have Claude produce the resource directly. (Requires the Worker to be deployed and <code>VITE_API_BASE</code> to be set.)
                 </p>
               )}
             </div>
+            )}
 
             <div className="next-steps">
               <h4>📝 What To Do Next</h4>
               <ol>
                 <li><strong>Copy</strong> the prompt above</li>
-                <li>Open <a href="https://copilot.microsoft.com" target="_blank" rel="noopener noreferrer">Copilot</a>, <a href="https://chat.openai.com" target="_blank" rel="noopener noreferrer">ChatGPT</a>, or <a href="https://claude.ai" target="_blank" rel="noopener noreferrer">Claude</a></li>
+                <li>Open <a href="https://copilot.microsoft.com" target="_blank" rel="noopener noreferrer"><strong>Microsoft Copilot</strong></a> — the school-approved AI tool</li>
                 <li><strong>Paste</strong> the prompt and press Enter</li>
                 <li>Review the generated resource</li>
-                <li>Ask the AI to modify anything that needs changing</li>
+                <li>Ask Copilot to modify anything that needs changing</li>
                 <li>Copy the final version and use the <strong>Convert</strong> tab to create Word/PDF</li>
               </ol>
+              <p style={{ fontSize: '0.9em', color: '#555', marginTop: '12px' }}>
+                <em>At home you may also use <a href="https://chat.openai.com" target="_blank" rel="noopener noreferrer">ChatGPT</a> or <a href="https://claude.ai" target="_blank" rel="noopener noreferrer">Claude</a> if you prefer. On school networks please use Copilot only, in line with your school's acceptable-use policy.</em>
+              </p>
             </div>
           </div>
         )}
