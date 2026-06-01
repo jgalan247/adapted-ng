@@ -6,6 +6,8 @@ import AdaptTab from './components/AdaptTab'
 import CreateTab from './components/CreateTab'
 import QuizTab from './components/QuizTab'
 import ConvertTab from './components/ConvertTab'
+import ProfileEditor from './components/ProfileEditor'
+import { mergePresets, EMPTY_FEATURES } from './utils/features'
 
 // Quick presets for common setups
 const PRESETS = [
@@ -22,6 +24,18 @@ const DEFAULT_PROFILE = {
   subject: 'english',
   keyStage: 'ks3',
   abilitySet: 'mixed',
+  features: mergePresets(['autism']),
+}
+
+// Migrate older saved profiles (no `features` object) by deriving from conditions.
+function migrateProfile(raw) {
+  const merged = { ...DEFAULT_PROFILE, ...raw }
+  if (!merged.features || typeof merged.features !== 'object') {
+    merged.features = merged.conditions?.length
+      ? mergePresets(merged.conditions)
+      : { ...EMPTY_FEATURES }
+  }
+  return merged
 }
 
 function App() {
@@ -39,10 +53,14 @@ function App() {
     // Load from localStorage on initial render
     const saved = localStorage.getItem('adaptedProfile')
     if (!saved) return DEFAULT_PROFILE
-    // Merge defaults for forward compatibility (e.g. abilitySet added later)
-    return { ...DEFAULT_PROFILE, ...JSON.parse(saved) }
+    return migrateProfile(JSON.parse(saved))
   })
   const [showPresets, setShowPresets] = useState(false)
+  const [editingProfile, setEditingProfile] = useState(false)
+
+  const updateFeatures = (nextFeatures) => {
+    setProfile((prev) => ({ ...prev, features: nextFeatures }))
+  }
 
   // Save to localStorage whenever profile changes
   useEffect(() => {
@@ -74,6 +92,7 @@ function App() {
       subject: preset.subject,
       keyStage: preset.keyStage,
       abilitySet: preset.abilitySet || 'mixed',
+      features: mergePresets(preset.conditions),
     })
     setShowPresets(false)
   }
@@ -89,7 +108,15 @@ function App() {
         showPresets={showPresets}
         setShowPresets={setShowPresets}
         applyPreset={applyPreset}
+        openProfileEditor={() => setEditingProfile(true)}
       />
+      {editingProfile && (
+        <ProfileEditor
+          profile={profile}
+          onChange={updateFeatures}
+          onClose={() => setEditingProfile(false)}
+        />
+      )}
       <main className="main-content">
         {activeTab !== 'home' && (
           <div className="subnav">

@@ -492,6 +492,31 @@ Make this a comprehensive learning resource with substantial text content explai
   }
 }
 
+// Build the per-student feature block injected into every prompt.
+// Falls back gracefully when features aren't yet set.
+import { FEATURE_RULES, selectedFeatureIds } from './features.js'
+
+function buildFeatureBlock(profile, subject) {
+  const features = profile?.features
+  if (!features) return ''
+  const ids = selectedFeatureIds(features)
+  const lines = ids
+    .map((id) => FEATURE_RULES[id])
+    .filter(Boolean)
+    // Drop the maths group if subject isn't maths/science — irrelevant noise.
+    .filter((f) => !f.label.startsWith('Visual mathematical') &&
+                   !f.label.startsWith('Step-by-step worked') &&
+                   !f.label.startsWith('Real-world maths')
+                   || ['maths', 'science'].includes(subject))
+    .map((f) => `- ${f.rule}`)
+  if (lines.length === 0) return ''
+  return `STUDENT-SPECIFIC ACCESSIBILITY FEATURES (apply ALL of the following):
+${lines.join('\n')}
+
+If two features appear to conflict, prioritise in this order: regulation/safety > predictability > processing scaffolds > visual layout > language style.
+`
+}
+
 // Generate the ADAPT prompt - for adapting existing resources
 export function generateAdaptPrompt(profile, resourceContent = '', outputFormat = 'same_as_original', options = {}) {
   const { sourceMode = 'paste' } = options // 'paste' | 'copilot_pdf'
@@ -506,6 +531,8 @@ export function generateAdaptPrompt(profile, resourceContent = '', outputFormat 
     ? `Adapt the resource I have uploaded to this conversation (the PDF/document attached above) for ${profile.keyStage.toUpperCase()} ${profile.subject} students with ${conditionNames.join(' and ')}. Read the uploaded file carefully and use it as the source material.`
     : `Adapt this ${profile.keyStage.toUpperCase()} ${profile.subject} resource for students with ${conditionNames.join(' and ')}.`
 
+  const featureBlock = buildFeatureBlock(profile, profile.subject)
+
   let prompt = `${opening}
 
 KEY STAGE: ${ksDescription}
@@ -516,16 +543,8 @@ ${formatSpec.instructions}
 MAINTAIN PEDAGOGICAL QUALITY:
 ${pedagogy.content}
 
-${abilitySet.rules ? abilitySet.rules + '\n\n' : ''}ACCESSIBILITY ADAPTATIONS:
-`
-
-  // Add condition-specific rules
-  profile.conditions.forEach(c => {
-    const rules = getConditionRules(c, profile.subject, TASK_TYPES.ADAPT)
-    if (rules) prompt += rules + '\n\n'
-  })
-
-  prompt += `FORMAT: Markdown${needsMaths ? ', LaTeX for maths ($\\frac{1}{2}$, $x^2$)' : ''}. End with brief "## Adaptations Made" summary.
+${abilitySet.rules ? abilitySet.rules + '\n\n' : ''}${featureBlock}
+FORMAT: Markdown${needsMaths ? ', LaTeX for maths ($\\frac{1}{2}$, $x^2$)' : ''}. End with brief "## Adaptations Made" summary.
 `
 
   if (sourceMode === 'copilot_pdf') {
@@ -576,16 +595,9 @@ ${pedagogy.content}
 
 QUESTION TYPES TO INCLUDE: ${pedagogy.questionTypes}
 
-${abilitySet.rules ? '=== ABILITY-SET ADAPTATIONS ===\n' + abilitySet.rules + '\n\n' : ''}=== ACCESSIBILITY (for students with ${conditionNames.join(' and ')}) ===
-`
-
-  // Add condition-specific rules (more concise, after content)
-  profile.conditions.forEach(c => {
-    const rules = getConditionRules(c, profile.subject, TASK_TYPES.CREATE)
-    if (rules) prompt += rules + '\n\n'
-  })
-
-  prompt += `=== OUTPUT ===
+${abilitySet.rules ? '=== ABILITY-SET ADAPTATIONS ===\n' + abilitySet.rules + '\n\n' : ''}=== ACCESSIBILITY (student profile: ${conditionNames.join(' + ') || 'custom'}) ===
+${buildFeatureBlock(profile, profile.subject)}
+=== OUTPUT ===
 FORMAT: Markdown${needsMaths ? ', LaTeX for maths ($\\frac{1}{2}$, $x^2$)' : ''}
 Include: Learning objective, key vocabulary definitions, worked examples, practice questions with progression, extension task.
 `
@@ -639,16 +651,9 @@ QUESTION DESIGN:
 - Progress from recall → understanding → application
 - Ensure questions directly test the learning objectives
 
-=== ACCESSIBILITY (for students with ${conditionNames.join(' and ')}) ===
-`
-
-  // Add condition-specific rules (including quiz-specific additions)
-  profile.conditions.forEach(c => {
-    const rules = getConditionRules(c, profile.subject, TASK_TYPES.QUIZ)
-    if (rules) prompt += rules + '\n\n'
-  })
-
-  prompt += `=== OUTPUT FORMAT ===
+=== ACCESSIBILITY (student profile: ${conditionNames.join(' + ') || 'custom'}) ===
+${buildFeatureBlock(profile, profile.subject)}
+=== OUTPUT FORMAT ===
 - **Q1** [X marks] as header
 - Separate questions with ---
 - MCQ: ☐ options with plausible distractors

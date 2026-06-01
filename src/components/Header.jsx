@@ -39,7 +39,7 @@ const ABILITY_SETS = [
   { value: 'top', label: 'Top set / Higher' },
 ]
 
-function Header({ profile, updateProfile, addCondition, removeCondition, presets, showPresets, setShowPresets, applyPreset }) {
+function Header({ profile, updateProfile, addCondition, removeCondition, presets, showPresets, setShowPresets, applyPreset, openProfileEditor }) {
   const [showAddCondition, setShowAddCondition] = useState(false)
 
   const availableConditions = CONDITIONS.filter(
@@ -217,6 +217,20 @@ function Header({ profile, updateProfile, addCondition, removeCondition, presets
               ))}
             </select>
           </div>
+
+          {openProfileEditor && (
+            <div className="profile-group">
+              <label>Detailed Profile</label>
+              <button
+                type="button"
+                className="profile-edit-btn"
+                onClick={openProfileEditor}
+                title="Tune the specific features this student needs"
+              >
+                ✏️ Edit features
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </header>
