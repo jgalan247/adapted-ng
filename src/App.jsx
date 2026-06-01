@@ -10,8 +10,25 @@ import ProfileEditor from './components/ProfileEditor'
 import { mergePresets, EMPTY_FEATURES } from './utils/features'
 
 // Quick presets for common setups
+// Hand-tuned demo preset — showcases the granular feature system.
+// Designed for: bottom-set KS4 Maths student with overlapping needs
+// (dyslexia + ADHD + EAL). NOT a generic merge — every feature here was
+// chosen deliberately for THIS profile.
+const CORBETTMATHS_FEATURES = {
+  visual_layout: 'visual_minimal',        // dense maths PDFs are already busy
+  attention: 'attn_short_bursts',         // ADHD + maths fatigue
+  structure: 'struct_high_predict',       // anchors anxious learners
+  language_style: 'lang_literal',         // EAL + ND both benefit
+  social: 'soc_pair',                     // pair talk supports EAL; less anxious than groups
+  reading: ['read_dyslexic_font', 'read_larger_text', 'read_decodable', 'read_less_per_page'],
+  vocabulary: ['vocab_preteach', 'vocab_visual_cards', 'vocab_glossary'],
+  processing: ['proc_step_by_step', 'proc_worked_examples', 'proc_concrete_first', 'proc_fewer_items', 'proc_chunking'],
+  regulation: ['reg_low_stakes', 'reg_clear_success', 'reg_sentence_starters'],
+  maths: ['math_visual_models', 'math_worked_solutions', 'math_real_world'],
+}
+
 const PRESETS = [
-  { name: 'Corbettmaths PDF - Bottom set, ND + EAL', conditions: ['dyslexia', 'adhd', 'eal'], subject: 'maths', keyStage: 'ks4', abilitySet: 'bottom' },
+  { name: 'Corbettmaths PDF - Bottom set, ND + EAL', conditions: ['dyslexia', 'adhd', 'eal'], subject: 'maths', keyStage: 'ks4', abilitySet: 'bottom', features: CORBETTMATHS_FEATURES },
   { name: 'Autism - English KS3', conditions: ['autism'], subject: 'english', keyStage: 'ks3', abilitySet: 'mixed' },
   { name: 'ADHD - Maths KS4', conditions: ['adhd'], subject: 'maths', keyStage: 'ks4', abilitySet: 'mixed' },
   { name: 'Dyslexia - English KS4', conditions: ['dyslexia'], subject: 'english', keyStage: 'ks4', abilitySet: 'mixed' },
@@ -92,7 +109,8 @@ function App() {
       subject: preset.subject,
       keyStage: preset.keyStage,
       abilitySet: preset.abilitySet || 'mixed',
-      features: mergePresets(preset.conditions),
+      // Use the preset's hand-tuned features if present; otherwise derive from conditions.
+      features: preset.features || mergePresets(preset.conditions),
     })
     setShowPresets(false)
   }

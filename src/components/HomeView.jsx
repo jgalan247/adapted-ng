@@ -27,11 +27,14 @@ function HomeView({ goTo, profile, featuredPreset, applyPreset }) {
       {featuredPreset && (
         <div className="home-featured" onClick={tryFeatured} role="button" tabIndex={0}
              onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && tryFeatured()}>
-          <div className="home-featured-badge">⭐ Try this</div>
-          <h3 className="home-featured-title">Adapt a Corbettmaths PDF for bottom-set students</h3>
+          <div className="home-featured-badge">⭐ Demo preset</div>
+          <h3 className="home-featured-title">Adapt a Corbettmaths PDF for a bottom-set student</h3>
           <p className="home-featured-desc">
-            Maths · KS4 · Bottom set · Dyslexia + ADHD + EAL. Upload a PDF to Copilot,
-            generate the adapt prompt here, paste it back — get an accessible worksheet.
+            <strong>Maths · KS4 · Bottom set.</strong> Loads a hand-tuned profile with
+            18 features specifically chosen for a student who is dyslexic + ADHD + EAL:
+            minimal visual clutter, literal language, pre-taught vocabulary with visual cards,
+            worked examples, real-world contexts, low-stakes practice. Open the
+            <em> Edit features </em> button after loading to see (and tweak) every choice.
           </p>
           <span className="home-featured-link">One-click setup →</span>
         </div>
