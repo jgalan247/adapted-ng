@@ -75,8 +75,60 @@ function App() {
   const [showPresets, setShowPresets] = useState(false)
   const [editingProfile, setEditingProfile] = useState(false)
 
+  // Named saved profiles (one per student/group). Persisted separately.
+  const [savedProfiles, setSavedProfiles] = useState(() => {
+    try {
+      const raw = localStorage.getItem('adaptedSavedProfiles')
+      return raw ? JSON.parse(raw) : {}
+    } catch {
+      return {}
+    }
+  })
+
+  useEffect(() => {
+    localStorage.setItem('adaptedSavedProfiles', JSON.stringify(savedProfiles))
+  }, [savedProfiles])
+
   const updateFeatures = (nextFeatures) => {
     setProfile((prev) => ({ ...prev, features: nextFeatures }))
+  }
+
+  // Snapshot the active profile under a chosen name.
+  const saveCurrentProfile = () => {
+    const suggested = (profile.conditions?.[0] || 'Student')
+      .charAt(0).toUpperCase() + (profile.conditions?.[0] || 'Student').slice(1)
+    const name = window.prompt(
+      'Name this profile (e.g. "Sam Y9 Maths", "Period 3 bottom set"):',
+      `${suggested} - ${profile.subject} ${profile.keyStage.toUpperCase()}`,
+    )
+    if (!name || !name.trim()) return
+    const id = `p_${Date.now().toString(36)}`
+    setSavedProfiles((prev) => ({
+      ...prev,
+      [id]: {
+        id,
+        name: name.trim(),
+        profile: { ...profile },
+        savedAt: Date.now(),
+      },
+    }))
+    setShowPresets(false)
+  }
+
+  const loadSavedProfile = (id) => {
+    const entry = savedProfiles[id]
+    if (!entry) return
+    setProfile({ ...DEFAULT_PROFILE, ...entry.profile })
+    setShowPresets(false)
+  }
+
+  const deleteSavedProfile = (id) => {
+    if (!window.confirm(`Delete "${savedProfiles[id]?.name}"?`)) return
+    setSavedProfiles((prev) => {
+      const next = { ...prev }
+      delete next[id]
+      return next
+    })
   }
 
   // Save to localStorage whenever profile changes
@@ -127,12 +179,17 @@ function App() {
         setShowPresets={setShowPresets}
         applyPreset={applyPreset}
         openProfileEditor={() => setEditingProfile(true)}
+        savedProfiles={savedProfiles}
+        saveCurrentProfile={saveCurrentProfile}
+        loadSavedProfile={loadSavedProfile}
+        deleteSavedProfile={deleteSavedProfile}
       />
       {editingProfile && (
         <ProfileEditor
           profile={profile}
           onChange={updateFeatures}
           onClose={() => setEditingProfile(false)}
+          saveCurrentProfile={saveCurrentProfile}
         />
       )}
       <main className="main-content">

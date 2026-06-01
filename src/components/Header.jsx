@@ -39,7 +39,7 @@ const ABILITY_SETS = [
   { value: 'top', label: 'Top set / Higher' },
 ]
 
-function Header({ profile, updateProfile, addCondition, removeCondition, presets, showPresets, setShowPresets, applyPreset, openProfileEditor }) {
+function Header({ profile, updateProfile, addCondition, removeCondition, presets, showPresets, setShowPresets, applyPreset, openProfileEditor, savedProfiles = {}, saveCurrentProfile, loadSavedProfile, deleteSavedProfile }) {
   const [showAddCondition, setShowAddCondition] = useState(false)
 
   const availableConditions = CONDITIONS.filter(
@@ -79,7 +79,7 @@ function Header({ profile, updateProfile, addCondition, removeCondition, presets
               gap: '6px'
             }}
           >
-            ⚡ Quick Presets
+            ⚡ Profiles & Presets
           </button>
           {showPresets && (
             <div style={{
@@ -91,11 +91,84 @@ function Header({ profile, updateProfile, addCondition, removeCondition, presets
               boxShadow: '0 4px 20px rgba(0,0,0,0.25)',
               padding: '8px',
               zIndex: 9999,
-              minWidth: '220px',
+              minWidth: '280px',
+              maxWidth: '340px',
               marginTop: '8px'
             }}>
+              {/* User-saved profiles */}
               <div style={{ padding: '8px 12px', fontSize: '0.75rem', color: '#666', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                Quick Setup
+                My saved students
+              </div>
+              {Object.keys(savedProfiles).length === 0 && (
+                <div style={{ padding: '8px 12px', fontSize: '0.85rem', color: '#999', fontStyle: 'italic' }}>
+                  None yet — save the current setup below.
+                </div>
+              )}
+              {Object.values(savedProfiles)
+                .sort((a, b) => (b.savedAt || 0) - (a.savedAt || 0))
+                .map((entry) => (
+                  <div
+                    key={entry.id}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      padding: '8px 12px',
+                      color: '#2c3e50',
+                      borderRadius: '4px',
+                      fontSize: '0.9rem',
+                      gap: '8px',
+                    }}
+                  >
+                    <span
+                      onClick={() => loadSavedProfile && loadSavedProfile(entry.id)}
+                      style={{ cursor: 'pointer', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+                      title={entry.name}
+                    >
+                      👤 {entry.name}
+                    </span>
+                    <button
+                      onClick={() => deleteSavedProfile && deleteSavedProfile(entry.id)}
+                      title="Delete this profile"
+                      style={{
+                        background: 'transparent',
+                        border: 'none',
+                        color: '#c33',
+                        cursor: 'pointer',
+                        fontSize: '0.9rem',
+                        padding: '2px 6px',
+                        borderRadius: '4px',
+                      }}
+                    >
+                      🗑
+                    </button>
+                  </div>
+                ))}
+
+              {/* Save current */}
+              {saveCurrentProfile && (
+                <div
+                  onClick={saveCurrentProfile}
+                  style={{
+                    margin: '8px 0',
+                    padding: '10px 12px',
+                    background: '#eef4f9',
+                    border: '1px dashed #6c8eaa',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    color: '#2d5a7b',
+                    fontWeight: 600,
+                    fontSize: '0.9rem',
+                    textAlign: 'center',
+                  }}
+                >
+                  💾 Save current setup as…
+                </div>
+              )}
+
+              {/* Built-in presets */}
+              <div style={{ padding: '8px 12px', fontSize: '0.75rem', color: '#666', textTransform: 'uppercase', letterSpacing: '0.05em', borderTop: '1px solid #eee', marginTop: '4px' }}>
+                Built-in starter presets
               </div>
               {presets.map((preset, i) => (
                 <div
@@ -109,8 +182,8 @@ function Header({ profile, updateProfile, addCondition, removeCondition, presets
                     fontSize: '0.9rem',
                     background: '#ffffff'
                   }}
-                  onMouseEnter={(e) => e.target.style.background = '#f0f0f0'}
-                  onMouseLeave={(e) => e.target.style.background = '#ffffff'}
+                  onMouseEnter={(e) => e.currentTarget.style.background = '#f0f0f0'}
+                  onMouseLeave={(e) => e.currentTarget.style.background = '#ffffff'}
                 >
                   {preset.name}
                 </div>

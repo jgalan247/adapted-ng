@@ -17,7 +17,7 @@ import {
   EMPTY_FEATURES,
 } from '../utils/features'
 
-function ProfileEditor({ profile, onChange, onClose }) {
+function ProfileEditor({ profile, onChange, onClose, saveCurrentProfile }) {
   const [features, setFeatures] = useState(profile.features)
   const conflicts = detectConflicts(features)
 
@@ -150,8 +150,21 @@ function ProfileEditor({ profile, onChange, onClose }) {
           <button className="btn btn-secondary" onClick={onClose}>
             Cancel
           </button>
+          {saveCurrentProfile && (
+            <button
+              className="btn btn-secondary"
+              onClick={() => {
+                onChange(features)
+                saveCurrentProfile()
+                onClose()
+              }}
+              title="Save these features into the active profile AND store under a name you can load later."
+            >
+              💾 Save & store as named…
+            </button>
+          )}
           <button className="btn btn-primary" onClick={save}>
-            Save profile
+            Apply to current
           </button>
         </div>
       </div>
