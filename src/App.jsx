@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import './App.css'
 import Header from './components/Header'
-import TabNavigation from './components/TabNavigation'
+import HomeView from './components/HomeView'
 import AdaptTab from './components/AdaptTab'
 import CreateTab from './components/CreateTab'
 import QuizTab from './components/QuizTab'
@@ -23,7 +23,16 @@ const DEFAULT_PROFILE = {
 }
 
 function App() {
-  const [activeTab, setActiveTab] = useState('adapt')
+  const [activeTab, setActiveTab] = useState('home')
+  const goTo = (tab) => setActiveTab(tab)
+  const goHome = () => setActiveTab('home')
+
+  const TAB_LABELS = {
+    create: '✏️ Create',
+    adapt: '🔄 Adapt',
+    quiz: '📝 Quiz',
+    convert: '📄 Format for Word / PDF',
+  }
   const [profile, setProfile] = useState(() => {
     // Load from localStorage on initial render
     const saved = localStorage.getItem('adaptedProfile')
@@ -76,8 +85,16 @@ function App() {
         setShowPresets={setShowPresets}
         applyPreset={applyPreset}
       />
-      <TabNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
       <main className="main-content">
+        {activeTab !== 'home' && (
+          <div className="subnav">
+            <button className="subnav-back" onClick={goHome}>
+              ← Home
+            </button>
+            <span className="subnav-current">{TAB_LABELS[activeTab]}</span>
+          </div>
+        )}
+        {activeTab === 'home' && <HomeView goTo={goTo} profile={profile} />}
         {activeTab === 'adapt' && <AdaptTab profile={profile} />}
         {activeTab === 'create' && <CreateTab profile={profile} />}
         {activeTab === 'quiz' && <QuizTab profile={profile} />}

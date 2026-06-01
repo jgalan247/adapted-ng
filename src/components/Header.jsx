@@ -49,7 +49,7 @@ function Header({ profile, updateProfile, addCondition, removeCondition, presets
         <div className="logo-centered">
           <div className="school-title">
             <span className="logo-icon">📚</span>
-            <h1>Le Rocquier School</h1>
+            <h1>Haute Vallée School</h1>
           </div>
           <div className="app-name">AI Powered for Inclusive Education</div>
         </div>
