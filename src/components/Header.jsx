@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 
 const CONDITIONS = [
   { value: 'autism', label: 'Autism' },
@@ -39,8 +39,17 @@ const ABILITY_SETS = [
   { value: 'top', label: 'Top set / Higher' },
 ]
 
-function Header({ profile, updateProfile, addCondition, removeCondition, presets, showPresets, setShowPresets, applyPreset, openProfileEditor, savedProfiles = {}, saveCurrentProfile, loadSavedProfile, deleteSavedProfile }) {
+function Header({ profile, updateProfile, addCondition, removeCondition, presets, showPresets, setShowPresets, applyPreset, openProfileEditor, savedProfiles = {}, saveCurrentProfile, loadSavedProfile, deleteSavedProfile, exportProfiles, importProfiles }) {
   const [showAddCondition, setShowAddCondition] = useState(false)
+  const fileInputRef = useRef(null)
+
+  const triggerImport = () => fileInputRef.current?.click()
+  const handleFile = (e) => {
+    const file = e.target.files?.[0]
+    if (file && importProfiles) importProfiles(file)
+    // Reset so the same filename can be re-picked
+    if (e.target) e.target.value = ''
+  }
 
   const availableConditions = CONDITIONS.filter(
     c => !profile.conditions.includes(c.value)
@@ -144,6 +153,55 @@ function Header({ profile, updateProfile, addCondition, removeCondition, presets
                     </button>
                   </div>
                 ))}
+
+              {/* Export / Import row */}
+              {(exportProfiles || importProfiles) && (
+                <div style={{ display: 'flex', gap: '6px', padding: '6px 4px 0' }}>
+                  {exportProfiles && (
+                    <button
+                      onClick={exportProfiles}
+                      title="Download a JSON file with all your saved profiles. Share it with colleagues."
+                      style={{
+                        flex: 1,
+                        padding: '8px',
+                        background: '#fff',
+                        border: '1px solid #c8d2db',
+                        borderRadius: '6px',
+                        cursor: 'pointer',
+                        fontSize: '0.82rem',
+                        color: '#2d5a7b',
+                      }}
+                    >
+                      ⤓ Export
+                    </button>
+                  )}
+                  {importProfiles && (
+                    <button
+                      onClick={triggerImport}
+                      title="Load profiles from a colleague's JSON export. Adds to your existing profiles — no overwrite."
+                      style={{
+                        flex: 1,
+                        padding: '8px',
+                        background: '#fff',
+                        border: '1px solid #c8d2db',
+                        borderRadius: '6px',
+                        cursor: 'pointer',
+                        fontSize: '0.82rem',
+                        color: '#2d5a7b',
+                      }}
+                    >
+                      ⤒ Import
+                    </button>
+                  )}
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="application/json,.json"
+                    style={{ display: 'none' }}
+                    onChange={handleFile}
+                  />
+                </div>
+              )}
 
               {/* Save current */}
               {saveCurrentProfile && (

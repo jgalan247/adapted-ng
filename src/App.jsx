@@ -131,6 +131,65 @@ function App() {
     })
   }
 
+  const exportProfiles = () => {
+    const entries = Object.values(savedProfiles)
+    if (entries.length === 0) {
+      window.alert('No saved profiles to export yet.')
+      return
+    }
+    const payload = {
+      schema: 'adapted-ng-profiles',
+      version: 1,
+      exportedAt: new Date().toISOString(),
+      profiles: entries,
+    }
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `adapted-ng-profiles-${new Date().toISOString().slice(0, 10)}.json`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  }
+
+  const importProfiles = (file) => {
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      try {
+        const parsed = JSON.parse(String(e.target?.result || ''))
+        if (parsed?.schema !== 'adapted-ng-profiles' || !Array.isArray(parsed.profiles)) {
+          throw new Error('Not an adapted-ng profile export file.')
+        }
+        // Always assign fresh IDs to avoid colliding with existing entries.
+        const additions = {}
+        let added = 0
+        for (const entry of parsed.profiles) {
+          if (!entry || !entry.profile || !entry.name) continue
+          const id = `p_${Date.now().toString(36)}_${added}`
+          additions[id] = {
+            id,
+            name: entry.name,
+            profile: entry.profile,
+            savedAt: Date.now(),
+          }
+          added++
+        }
+        if (added === 0) {
+          window.alert('File parsed but contained no valid profiles.')
+          return
+        }
+        setSavedProfiles((prev) => ({ ...prev, ...additions }))
+        window.alert(`Imported ${added} profile${added === 1 ? '' : 's'}.`)
+      } catch (err) {
+        window.alert(`Couldn't import: ${err.message || err}`)
+      }
+    }
+    reader.readAsText(file)
+  }
+
   // Save to localStorage whenever profile changes
   useEffect(() => {
     localStorage.setItem('adaptedProfile', JSON.stringify(profile))
@@ -183,6 +242,8 @@ function App() {
         saveCurrentProfile={saveCurrentProfile}
         loadSavedProfile={loadSavedProfile}
         deleteSavedProfile={deleteSavedProfile}
+        exportProfiles={exportProfiles}
+        importProfiles={importProfiles}
       />
       {editingProfile && (
         <ProfileEditor
