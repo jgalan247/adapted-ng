@@ -11,6 +11,7 @@ const OUTPUT_FORMATS = [
 ]
 
 function AdaptTab({ profile }) {
+  const [sourceMode, setSourceMode] = useState('paste') // 'paste' | 'copilot_pdf'
   const [resourceContent, setResourceContent] = useState('')
   const [outputFormat, setOutputFormat] = useState('same_as_original')
   const [generatedPrompt, setGeneratedPrompt] = useState('')
@@ -18,7 +19,7 @@ function AdaptTab({ profile }) {
   const [showPrompt, setShowPrompt] = useState(false)
 
   const handleGenerate = () => {
-    const prompt = generateAdaptPrompt(profile, resourceContent, outputFormat)
+    const prompt = generateAdaptPrompt(profile, resourceContent, outputFormat, { sourceMode })
     setGeneratedPrompt(prompt)
     setShowPrompt(true)
   }
@@ -50,7 +51,7 @@ function AdaptTab({ profile }) {
     setTimeout(() => setCopied(false), 2000)
   }
 
-  const canGenerate = resourceContent.trim().length > 0
+  const canGenerate = sourceMode === 'copilot_pdf' || resourceContent.trim().length > 0
 
   return (
     <div className="wizard">
@@ -64,6 +65,39 @@ function AdaptTab({ profile }) {
       <div className="wizard-content">
         {!showPrompt ? (
           <div>
+            {/* Source Mode toggle */}
+            <div style={{ marginBottom: '20px' }}>
+              <label className="form-label" style={{ marginBottom: '10px', display: 'block' }}>Where is your resource?</label>
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                {[
+                  { value: 'paste', label: '📋 I will paste the text' },
+                  { value: 'copilot_pdf', label: '📎 I have uploaded a PDF to Copilot' },
+                ].map(mode => (
+                  <button
+                    key={mode.value}
+                    onClick={() => setSourceMode(mode.value)}
+                    style={{
+                      padding: '10px 16px',
+                      borderRadius: '20px',
+                      border: sourceMode === mode.value ? '2px solid var(--color-primary)' : '2px solid var(--color-border)',
+                      background: sourceMode === mode.value ? 'var(--color-primary)' : 'white',
+                      color: sourceMode === mode.value ? 'white' : 'var(--color-text)',
+                      cursor: 'pointer',
+                      fontSize: '0.9rem',
+                      fontWeight: '500',
+                    }}
+                  >
+                    {mode.label}
+                  </button>
+                ))}
+              </div>
+              {sourceMode === 'copilot_pdf' && (
+                <p className="form-hint" style={{ marginTop: '8px' }}>
+                  Best for Maths PDFs (Corbettmaths, exam papers) with equations or diagrams. Upload the PDF to Copilot first, then paste the generated prompt into the same conversation.
+                </p>
+              )}
+            </div>
+
             {/* Output Format - Horizontal Pills */}
             <div style={{ marginBottom: '20px' }}>
               <label className="form-label" style={{ marginBottom: '10px', display: 'block' }}>Output Format</label>
@@ -92,23 +126,41 @@ function AdaptTab({ profile }) {
             </div>
 
             {/* Resource Input */}
-            <div className="form-group">
-              <label className="form-label">Paste Your Resource</label>
-              <textarea
-                className="form-textarea"
-                placeholder="Paste your worksheet, lesson plan, or educational content here...
+            {sourceMode === 'paste' ? (
+              <div className="form-group">
+                <label className="form-label">Paste Your Resource</label>
+                <textarea
+                  className="form-textarea"
+                  placeholder="Paste your worksheet, lesson plan, or educational content here...
 
 Tip: Select All (Ctrl+A) → Copy (Ctrl+C) from your Word/PDF/PowerPoint document"
-                value={resourceContent}
-                onChange={(e) => setResourceContent(e.target.value)}
-                style={{ minHeight: '280px' }}
-              />
-              {resourceContent.length > 0 && (
-                <p className="form-hint" style={{ color: 'var(--color-success)' }}>
-                  ✓ {resourceContent.length} characters pasted
+                  value={resourceContent}
+                  onChange={(e) => setResourceContent(e.target.value)}
+                  style={{ minHeight: '280px' }}
+                />
+                {resourceContent.length > 0 && (
+                  <p className="form-hint" style={{ color: 'var(--color-success)' }}>
+                    ✓ {resourceContent.length} characters pasted
+                  </p>
+                )}
+              </div>
+            ) : (
+              <div className="form-group" style={{
+                background: '#f4f0ff',
+                border: '1px solid #d9ccff',
+                borderRadius: '12px',
+                padding: '16px',
+              }}>
+                <p style={{ margin: '0 0 8px 0' }}>
+                  <strong>You're all set.</strong> The generated prompt will tell Copilot to adapt the PDF you uploaded.
                 </p>
-              )}
-            </div>
+                <ol style={{ margin: '8px 0 0 20px', padding: 0, fontSize: '0.95rem', lineHeight: 1.6 }}>
+                  <li>Open <strong>Microsoft Copilot</strong> and drag your PDF into the chat</li>
+                  <li>Come back here, click <strong>Generate Adapted Prompt</strong></li>
+                  <li>Copy the prompt and paste it into the <em>same Copilot conversation</em></li>
+                </ol>
+              </div>
+            )}
 
             {/* Generate Button */}
             <button

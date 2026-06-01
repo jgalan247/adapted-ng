@@ -679,6 +679,47 @@ body {
   margin: 0;
   font-size: 1rem;
 }
+.home-featured {
+  position: relative;
+  background: linear-gradient(135deg, #fff8e1 0%, #ffe8b3 100%);
+  border: 2px solid #e8b44a;
+  border-radius: 16px;
+  padding: var(--space-lg);
+  margin-bottom: var(--space-lg);
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+.home-featured:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(232, 180, 74, 0.3);
+}
+.home-featured-badge {
+  display: inline-block;
+  background: #8b6914;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+  margin-bottom: var(--space-sm);
+  letter-spacing: 0.5px;
+}
+.home-featured-title {
+  font-family: var(--font-display, 'Fraunces', serif);
+  margin: 0 0 var(--space-sm);
+  color: #5a4a14;
+  font-size: 1.25rem;
+}
+.home-featured-desc {
+  margin: 0 0 var(--space-sm);
+  color: #4a3d10;
+  line-height: 1.5;
+}
+.home-featured-link {
+  font-weight: 600;
+  color: #5a4a14;
+}
+
 .home-cards {
   display: grid;
   grid-template-columns: 1fr 1fr;

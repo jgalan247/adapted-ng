@@ -32,6 +32,13 @@ const KEY_STAGES = [
   { value: 'ks5', label: 'KS5 (16-18)' },
 ]
 
+const ABILITY_SETS = [
+  { value: 'mixed', label: 'Mixed ability' },
+  { value: 'bottom', label: 'Bottom set / Foundation' },
+  { value: 'middle', label: 'Middle / Core' },
+  { value: 'top', label: 'Top set / Higher' },
+]
+
 function Header({ profile, updateProfile, addCondition, removeCondition, presets, showPresets, setShowPresets, applyPreset }) {
   const [showAddCondition, setShowAddCondition] = useState(false)
 
@@ -195,6 +202,18 @@ function Header({ profile, updateProfile, addCondition, removeCondition, presets
             >
               {KEY_STAGES.map(ks => (
                 <option key={ks.value} value={ks.value}>{ks.label}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="profile-group">
+            <label>Ability Set</label>
+            <select
+              value={profile.abilitySet || 'mixed'}
+              onChange={(e) => updateProfile('abilitySet', e.target.value)}
+            >
+              {ABILITY_SETS.map(a => (
+                <option key={a.value} value={a.value}>{a.label}</option>
               ))}
             </select>
           </div>

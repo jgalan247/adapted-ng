@@ -2,10 +2,17 @@
  * HomeView — landing page that frames the flow correctly:
  *   Create OR Adapt (Quiz is a sub-choice of either) → then optionally Convert.
  */
-function HomeView({ goTo, profile }) {
+function HomeView({ goTo, profile, featuredPreset, applyPreset }) {
   const conditionsLabel = profile.conditions
     .map((c) => c.charAt(0).toUpperCase() + c.slice(1).replace('_', ' '))
     .join(', ')
+
+  const tryFeatured = () => {
+    if (featuredPreset && applyPreset) {
+      applyPreset(featuredPreset)
+      goTo('adapt')
+    }
+  }
 
   return (
     <div className="home-view">
@@ -13,9 +20,22 @@ function HomeView({ goTo, profile }) {
         <h2 className="home-title">What would you like to do?</h2>
         <p className="home-subtitle">
           Adapting for <strong>{conditionsLabel}</strong> · {profile.subject} ·{' '}
-          {profile.keyStage.toUpperCase()}
+          {profile.keyStage.toUpperCase()} · <em>{profile.abilitySet || 'mixed'} ability</em>
         </p>
       </div>
+
+      {featuredPreset && (
+        <div className="home-featured" onClick={tryFeatured} role="button" tabIndex={0}
+             onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && tryFeatured()}>
+          <div className="home-featured-badge">⭐ Try this</div>
+          <h3 className="home-featured-title">Adapt a Corbettmaths PDF for bottom-set students</h3>
+          <p className="home-featured-desc">
+            Maths · KS4 · Bottom set · Dyslexia + ADHD + EAL. Upload a PDF to Copilot,
+            generate the adapt prompt here, paste it back — get an accessible worksheet.
+          </p>
+          <span className="home-featured-link">One-click setup →</span>
+        </div>
+      )}
 
       <div className="home-cards">
         {/* CREATE */}

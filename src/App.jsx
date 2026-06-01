@@ -9,17 +9,19 @@ import ConvertTab from './components/ConvertTab'
 
 // Quick presets for common setups
 const PRESETS = [
-  { name: 'Autism - English KS3', conditions: ['autism'], subject: 'english', keyStage: 'ks3' },
-  { name: 'ADHD - Maths KS4', conditions: ['adhd'], subject: 'maths', keyStage: 'ks4' },
-  { name: 'Dyslexia - English KS4', conditions: ['dyslexia'], subject: 'english', keyStage: 'ks4' },
-  { name: 'Autism + ADHD - Science KS3', conditions: ['autism', 'adhd'], subject: 'science', keyStage: 'ks3' },
-  { name: 'EAL - History KS5', conditions: ['eal'], subject: 'history', keyStage: 'ks5' },
+  { name: 'Corbettmaths PDF - Bottom set, ND + EAL', conditions: ['dyslexia', 'adhd', 'eal'], subject: 'maths', keyStage: 'ks4', abilitySet: 'bottom' },
+  { name: 'Autism - English KS3', conditions: ['autism'], subject: 'english', keyStage: 'ks3', abilitySet: 'mixed' },
+  { name: 'ADHD - Maths KS4', conditions: ['adhd'], subject: 'maths', keyStage: 'ks4', abilitySet: 'mixed' },
+  { name: 'Dyslexia - English KS4', conditions: ['dyslexia'], subject: 'english', keyStage: 'ks4', abilitySet: 'mixed' },
+  { name: 'Autism + ADHD - Science KS3', conditions: ['autism', 'adhd'], subject: 'science', keyStage: 'ks3', abilitySet: 'mixed' },
+  { name: 'EAL - History KS5', conditions: ['eal'], subject: 'history', keyStage: 'ks5', abilitySet: 'mixed' },
 ]
 
 const DEFAULT_PROFILE = {
   conditions: ['autism'],
   subject: 'english',
-  keyStage: 'ks3'
+  keyStage: 'ks3',
+  abilitySet: 'mixed',
 }
 
 function App() {
@@ -36,7 +38,9 @@ function App() {
   const [profile, setProfile] = useState(() => {
     // Load from localStorage on initial render
     const saved = localStorage.getItem('adaptedProfile')
-    return saved ? JSON.parse(saved) : DEFAULT_PROFILE
+    if (!saved) return DEFAULT_PROFILE
+    // Merge defaults for forward compatibility (e.g. abilitySet added later)
+    return { ...DEFAULT_PROFILE, ...JSON.parse(saved) }
   })
   const [showPresets, setShowPresets] = useState(false)
 
@@ -68,7 +72,8 @@ function App() {
     setProfile({
       conditions: preset.conditions,
       subject: preset.subject,
-      keyStage: preset.keyStage
+      keyStage: preset.keyStage,
+      abilitySet: preset.abilitySet || 'mixed',
     })
     setShowPresets(false)
   }
@@ -94,7 +99,14 @@ function App() {
             <span className="subnav-current">{TAB_LABELS[activeTab]}</span>
           </div>
         )}
-        {activeTab === 'home' && <HomeView goTo={goTo} profile={profile} />}
+        {activeTab === 'home' && (
+          <HomeView
+            goTo={goTo}
+            profile={profile}
+            featuredPreset={PRESETS[0]}
+            applyPreset={applyPreset}
+          />
+        )}
         {activeTab === 'adapt' && <AdaptTab profile={profile} />}
         {activeTab === 'create' && <CreateTab profile={profile} />}
         {activeTab === 'quiz' && <QuizTab profile={profile} />}

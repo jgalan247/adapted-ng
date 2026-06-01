@@ -361,6 +361,42 @@ const KEY_STAGE_DESCRIPTIONS = {
   ks5: 'Year 12-13 students (ages 16-18). A-Level. Use sophisticated academic language and expect higher-order thinking.',
 }
 
+// Ability-set descriptors — layered on top of conditions/EAL
+const ABILITY_SET_RULES = {
+  mixed: {
+    name: 'Mixed ability',
+    rules: '',
+  },
+  bottom: {
+    name: 'Bottom set / Foundation tier',
+    rules: `ABILITY SET — BOTTOM / FOUNDATION:
+- Reduce cognitive load: fewer questions per page, more white space, larger font
+- Reading age 2-3 years below chronological age in all instructions
+- Pre-teach key vocabulary inline (define on first use, glossary at end)
+- Smaller cognitive jumps: every step explicitly shown, no leaps in reasoning
+- More worked examples (2-3) before practice questions
+- Scaffold longer tasks with sentence starters and partial answers
+- Replace abstract questions with concrete, real-world contexts where possible
+- Aim for ~70% success rate to build confidence (avoid demoralising failure)`,
+  },
+  middle: {
+    name: 'Middle / Core set',
+    rules: `ABILITY SET — MIDDLE / CORE:
+- Pitch at the upper end of the key stage with light scaffolding
+- One worked example per concept, then practice with gradual progression
+- Stretch questions in the final 20% for those who finish quickly`,
+  },
+  top: {
+    name: 'Top set / Higher tier',
+    rules: `ABILITY SET — TOP / HIGHER:
+- Pitch beyond the standard key stage; include some content from the next tier up
+- Minimal scaffolding; expect students to handle multi-step reasoning
+- Open-ended extension tasks that require synthesis, evaluation, or proof
+- Include at least one challenging "stretch" question per section
+- Use precise subject vocabulary throughout`,
+  },
+}
+
 // Output format specifications
 const OUTPUT_FORMAT_SPECS = {
   worksheet: {
@@ -457,23 +493,30 @@ Make this a comprehensive learning resource with substantial text content explai
 }
 
 // Generate the ADAPT prompt - for adapting existing resources
-export function generateAdaptPrompt(profile, resourceContent = '', outputFormat = 'same_as_original') {
+export function generateAdaptPrompt(profile, resourceContent = '', outputFormat = 'same_as_original', options = {}) {
+  const { sourceMode = 'paste' } = options // 'paste' | 'copilot_pdf'
   const conditionNames = profile.conditions.map(c => CONDITION_RULES[c]?.name).filter(Boolean)
   const ksDescription = KEY_STAGE_DESCRIPTIONS[profile.keyStage] || ''
   const formatSpec = OUTPUT_FORMAT_SPECS[outputFormat] || OUTPUT_FORMAT_SPECS.same_as_original
   const pedagogy = getPedagogy(profile.subject)
   const needsMaths = ['maths', 'science', 'computing'].includes(profile.subject)
+  const abilitySet = ABILITY_SET_RULES[profile.abilitySet] || ABILITY_SET_RULES.mixed
 
-  let prompt = `Adapt this ${profile.keyStage.toUpperCase()} ${profile.subject} resource for students with ${conditionNames.join(' and ')}.
+  const opening = sourceMode === 'copilot_pdf'
+    ? `Adapt the resource I have uploaded to this conversation (the PDF/document attached above) for ${profile.keyStage.toUpperCase()} ${profile.subject} students with ${conditionNames.join(' and ')}. Read the uploaded file carefully and use it as the source material.`
+    : `Adapt this ${profile.keyStage.toUpperCase()} ${profile.subject} resource for students with ${conditionNames.join(' and ')}.`
+
+  let prompt = `${opening}
 
 KEY STAGE: ${ksDescription}
+ABILITY SET: ${abilitySet.name}
 
 ${formatSpec.instructions}
 
 MAINTAIN PEDAGOGICAL QUALITY:
 ${pedagogy.content}
 
-ACCESSIBILITY ADAPTATIONS:
+${abilitySet.rules ? abilitySet.rules + '\n\n' : ''}ACCESSIBILITY ADAPTATIONS:
 `
 
   // Add condition-specific rules
@@ -483,10 +526,18 @@ ACCESSIBILITY ADAPTATIONS:
   })
 
   prompt += `FORMAT: Markdown${needsMaths ? ', LaTeX for maths ($\\frac{1}{2}$, $x^2$)' : ''}. End with brief "## Adaptations Made" summary.
+`
 
+  if (sourceMode === 'copilot_pdf') {
+    prompt += `
+IMPORTANT: The source is the uploaded file in this Copilot conversation. If the file contains diagrams, equations or images, describe them in words within the adapted version and flag with "[ORIGINAL DIAGRAM — recreate or screenshot from source]" so the teacher knows to insert the visual.
+`
+  } else {
+    prompt += `
 RESOURCE TO ADAPT:
 ${resourceContent || '[PASTE RESOURCE HERE]'}
 `
+  }
 
   return prompt
 }
@@ -504,6 +555,8 @@ export function generateCreatePrompt(profile, options = {}) {
   if (includeMain) structure.push('Main (20-30 min)')
   if (includePlenary) structure.push('Plenary (5-10 min)')
 
+  const abilitySet = ABILITY_SET_RULES[profile.abilitySet] || ABILITY_SET_RULES.mixed
+
   // Build the prompt with CONTENT FIRST
   let prompt = `Create a ${profile.keyStage.toUpperCase()} ${profile.subject} ${resourceType} on "${topic || '[Topic]'}".
 
@@ -511,6 +564,7 @@ LEARNING OBJECTIVES:
 ${learningObjectives || '[Not specified]'}
 
 KEY STAGE: ${ksDescription}
+ABILITY SET: ${abilitySet.name}
 DURATION: ${duration || '40'} minutes
 ${structure.length > 0 ? `STRUCTURE: ${structure.join(' → ')}` : ''}
 
@@ -522,7 +576,7 @@ ${pedagogy.content}
 
 QUESTION TYPES TO INCLUDE: ${pedagogy.questionTypes}
 
-=== ACCESSIBILITY (for students with ${conditionNames.join(' and ')}) ===
+${abilitySet.rules ? '=== ABILITY-SET ADAPTATIONS ===\n' + abilitySet.rules + '\n\n' : ''}=== ACCESSIBILITY (for students with ${conditionNames.join(' and ')}) ===
 `
 
   // Add condition-specific rules (more concise, after content)
@@ -563,10 +617,14 @@ export function generateQuizPrompt(profile, options = {}) {
   const topicLine = sourceType === 'topic' ? sourceTopic : ''
   const textBlock = sourceType === 'text' ? `\nSOURCE TEXT:\n${sourceText}\n` : ''
 
+  const abilitySet = ABILITY_SET_RULES[profile.abilitySet] || ABILITY_SET_RULES.mixed
+
   let prompt = `Create a ${profile.subject} assessment on "${topicLine || '[Topic]'}".
 ${textBlock}
 KEY STAGE: ${ksDescription}
+ABILITY SET: ${abilitySet.name}
 ${examBoard && ['ks4', 'ks5'].includes(profile.keyStage) ? `EXAM BOARD STYLE: ${examBoard}` : ''}
+${abilitySet.rules ? '\n' + abilitySet.rules + '\n' : ''}
 
 === ASSESSMENT CONTENT (PRIORITY) ===
 
