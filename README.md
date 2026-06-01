@@ -40,3 +40,8 @@ npm run lint
 - KS3 (Years 7–9, ages 11–14)
 - KS4 (Years 10–11, GCSE)
 - KS5 (Years 12–13, A-Level)
+
+## Docs
+
+- [DEPLOY.md](DEPLOY.md) — deploying to Cloudflare Pages or GitHub Pages
+- [SHARING.md](SHARING.md) — best practice for SENCOs and teachers sharing student profiles (data protection, naming, handover workflows)
