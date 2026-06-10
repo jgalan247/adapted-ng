@@ -397,6 +397,47 @@ const ABILITY_SET_RULES = {
   },
 }
 
+// Exam-board specifications — shape command words, mark schemes and question
+// style to match the board the school is entered with. Relevant at GCSE/A-level
+// (KS4/KS5); ignored when no board is chosen.
+const EXAM_BOARD_SPECS = {
+  aqa: {
+    name: 'AQA',
+    rules: `EXAM BOARD — AQA:
+- Use AQA command words precisely (e.g. State, Name, Describe, Explain, Compare, Evaluate, "To what extent").
+- Match AQA question stems and mark tariffs: short factual recall for 1-2 marks, "Explain" for 3-4 marks, extended response for 6+ marks.
+- For extended answers, write to AQA's levels-of-response (banded) mark scheme, signposting AO1/AO2/AO3 where relevant.
+- Keep wording concise and unambiguous, as in AQA papers.`,
+  },
+  ocr: {
+    name: 'OCR',
+    rules: `EXAM BOARD — OCR:
+- Use OCR command words (e.g. Identify, Describe, Explain, Calculate, Discuss, Justify).
+- Structure multi-part questions that build in difficulty (a, b, c) with clear mark tariffs per part.
+- For longer answers use OCR's "Quality of extended response" levelled mark scheme, rewarding linked, well-structured reasoning.
+- Reflect OCR's emphasis on application to unfamiliar contexts.`,
+  },
+  edexcel: {
+    name: 'Edexcel (Pearson)',
+    rules: `EXAM BOARD — EDEXCEL (Pearson):
+- Use Edexcel command words (e.g. Give, State, Describe, Explain, Analyse, Evaluate, "Assess").
+- Favour scaffolded, context-rich questions that move from recall to application.
+- Use Edexcel's points-based mark schemes for short answers and levels-based descriptors (AO1/AO2/AO3) for extended responses.
+- Match Edexcel's clear mark allocation in [n marks] after each question.`,
+  },
+}
+
+// Build the exam-board block injected into prompts when a board is chosen.
+// Only applied at KS4 (GCSE) — KS3 has no board, KS5 handled separately if needed.
+function buildExamBoardBlock(profile) {
+  if (profile?.keyStage !== 'ks4') return ''
+  const board = EXAM_BOARD_SPECS[profile?.examBoard]
+  if (!board) return ''
+  return `=== EXAM BOARD ALIGNMENT (${board.name}) ===
+${board.rules}
+`
+}
+
 // Output format specifications
 const OUTPUT_FORMAT_SPECS = {
   worksheet: {
@@ -543,8 +584,8 @@ ${formatSpec.instructions}
 MAINTAIN PEDAGOGICAL QUALITY:
 ${pedagogy.content}
 
-${abilitySet.rules ? abilitySet.rules + '\n\n' : ''}${featureBlock}
-FORMAT: Markdown${needsMaths ? ', LaTeX for maths ($\\frac{1}{2}$, $x^2$)' : ''}. End with brief "## Adaptations Made" summary.
+${abilitySet.rules ? abilitySet.rules + '\n\n' : ''}${buildExamBoardBlock(profile)}${featureBlock}
+FORMAT: Produce a clean, print-ready document formatted for PDF — clear headings, well-spaced sections and a page-friendly layout${needsMaths ? ', using LaTeX for maths ($\\frac{1}{2}$, $x^2$)' : ''}. End with brief "## Adaptations Made" summary.
 `
 
   if (sourceMode === 'copilot_pdf') {
@@ -595,10 +636,10 @@ ${pedagogy.content}
 
 QUESTION TYPES TO INCLUDE: ${pedagogy.questionTypes}
 
-${abilitySet.rules ? '=== ABILITY-SET ADAPTATIONS ===\n' + abilitySet.rules + '\n\n' : ''}=== ACCESSIBILITY (student profile: ${conditionNames.join(' + ') || 'custom'}) ===
+${abilitySet.rules ? '=== ABILITY-SET ADAPTATIONS ===\n' + abilitySet.rules + '\n\n' : ''}${buildExamBoardBlock(profile)}=== ACCESSIBILITY (student profile: ${conditionNames.join(' + ') || 'custom'}) ===
 ${buildFeatureBlock(profile, profile.subject)}
 === OUTPUT ===
-FORMAT: Markdown${needsMaths ? ', LaTeX for maths ($\\frac{1}{2}$, $x^2$)' : ''}
+FORMAT: Clean, print-ready document formatted for PDF — clear headings, well-spaced sections, page-friendly layout${needsMaths ? ', LaTeX for maths ($\\frac{1}{2}$, $x^2$)' : ''}
 Include: Learning objective, key vocabulary definitions, worked examples, practice questions with progression, extension task.
 `
 
@@ -631,11 +672,21 @@ export function generateQuizPrompt(profile, options = {}) {
 
   const abilitySet = ABILITY_SET_RULES[profile.abilitySet] || ABILITY_SET_RULES.mixed
 
+  // The student profile's exam board takes precedence; fall back to the quiz's own
+  // board option. Only applied at KS4. Use the full board spec when we have one,
+  // else a simple style hint.
+  const resolvedBoard = profile.examBoard || examBoard
+  const examBoardBlock = profile.keyStage !== 'ks4'
+    ? ''
+    : EXAM_BOARD_SPECS[resolvedBoard]
+      ? buildExamBoardBlock({ keyStage: 'ks4', examBoard: resolvedBoard })
+      : (resolvedBoard ? `EXAM BOARD STYLE: ${resolvedBoard}\n` : '')
+
   let prompt = `Create a ${profile.subject} assessment on "${topicLine || '[Topic]'}".
 ${textBlock}
 KEY STAGE: ${ksDescription}
 ABILITY SET: ${abilitySet.name}
-${examBoard && ['ks4', 'ks5'].includes(profile.keyStage) ? `EXAM BOARD STYLE: ${examBoard}` : ''}
+${examBoardBlock}
 ${abilitySet.rules ? '\n' + abilitySet.rules + '\n' : ''}
 
 === ASSESSMENT CONTENT (PRIORITY) ===
@@ -654,6 +705,7 @@ QUESTION DESIGN:
 === ACCESSIBILITY (student profile: ${conditionNames.join(' + ') || 'custom'}) ===
 ${buildFeatureBlock(profile, profile.subject)}
 === OUTPUT FORMAT ===
+Produce a clean, print-ready document formatted for PDF (page-friendly layout, clear spacing):
 - **Q1** [X marks] as header
 - Separate questions with ---
 - MCQ: ☐ options with plausible distractors

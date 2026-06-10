@@ -39,6 +39,13 @@ const ABILITY_SETS = [
   { value: 'top', label: 'Top set / Higher' },
 ]
 
+const EXAM_BOARDS = [
+  { value: '', label: 'No specific board' },
+  { value: 'aqa', label: 'AQA' },
+  { value: 'ocr', label: 'OCR' },
+  { value: 'edexcel', label: 'Edexcel' },
+]
+
 function Header({ profile, updateProfile, addCondition, removeCondition, presets, showPresets, setShowPresets, applyPreset, openProfileEditor, savedProfiles = {}, saveCurrentProfile, loadSavedProfile, deleteSavedProfile, exportProfiles, importProfiles }) {
   const [showAddCondition, setShowAddCondition] = useState(false)
   const fileInputRef = useRef(null)
@@ -348,6 +355,20 @@ function Header({ profile, updateProfile, addCondition, removeCondition, presets
               ))}
             </select>
           </div>
+
+          {profile.keyStage === 'ks4' && (
+            <div className="profile-group">
+              <label>Exam Board</label>
+              <select
+                value={profile.examBoard || ''}
+                onChange={(e) => updateProfile('examBoard', e.target.value)}
+              >
+                {EXAM_BOARDS.map(eb => (
+                  <option key={eb.value} value={eb.value}>{eb.label}</option>
+                ))}
+              </select>
+            </div>
+          )}
 
           {openProfileEditor && (
             <div className="profile-group">

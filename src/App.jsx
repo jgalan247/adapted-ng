@@ -41,6 +41,7 @@ const DEFAULT_PROFILE = {
   subject: 'english',
   keyStage: 'ks3',
   abilitySet: 'mixed',
+  examBoard: '',
   features: mergePresets(['autism']),
 }
 
